@@ -1,0 +1,32 @@
+{
+	"name": "@polyui/root",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"prep": "cargo test",
+		"build": "turbo run build",
+		"format": "prettier --config .prettierrc.js --write \"**/*.{ts,tsx,html,scss,json,yml,md}\"",
+		"desktop": "pnpm --filter @polyui/desktop --",
+		"web": "pnpm --filter @polyui/web -- ",
+		"ui": "pnpm --filter @polyui/ui -- ",
+		"server": "pnpm --filter @polyui/server -- ",
+		"codegen": "cargo test api::tests::test_and_export_rspc_bindings -- --exact",
+		"typecheck": "pnpm -r exec tsc"
+	},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^3.3.0",
+		"prettier": "^2.7.1",
+		"turbo": "^1.5.5",
+		"turbo-ignore": "^0.3.0",
+		"typescript": "^4.8.4"
+	},
+	"overrides": {
+		"@types/node": "^16.0.0"
+	},
+	"engines": {
+		"pnpm": ">=6.0.0",
+		"npm": "pnpm",
+		"yarn": "pnpm",
+		"node": ">=14.0.0"
+	}
+}
