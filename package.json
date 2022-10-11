@@ -9,6 +9,9 @@
 		"desktop": "pnpm --filter @polyui/desktop --",
 		"web": "pnpm --filter @polyui/web -- ",
 		"ui": "pnpm --filter @polyui/ui -- ",
+		"interface": "pnpm --filter @polyui/interface -- ",
+		"core": "pnpm --filter @polyui/core -- ",
+		"plugin": "pnpm --filter @polyui/core -- ",
 		"typecheck": "pnpm -r exec tsc"
 	},
 	"devDependencies": {
