@@ -9,8 +9,6 @@
 		"desktop": "pnpm --filter @polyui/desktop --",
 		"web": "pnpm --filter @polyui/web -- ",
 		"ui": "pnpm --filter @polyui/ui -- ",
-		"server": "pnpm --filter @polyui/server -- ",
-		"codegen": "cargo test api::tests::test_and_export_rspc_bindings -- --exact",
 		"typecheck": "pnpm -r exec tsc"
 	},
 	"devDependencies": {

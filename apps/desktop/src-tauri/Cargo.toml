@@ -1,0 +1,29 @@
+[package]
+name = "onelauncher"
+version = "0.1.0"
+description = "Next generation Minecraft launcher."
+authors = ["Polyfrost"]
+license = ""
+repository = "https://github.com/polyfrost/polyui"
+default-run = "onelauncher"
+edition = "2021"
+build = "build.rs"
+
+[dependencies]
+tauri = { version = "1.1.1" }
+polyui-core = { path = "../../../core" }
+tokio = { version = "1.21.2" }
+window-shadows = "0.2.0"
+tracing = "0.1.36"
+serde = "1.0.145"
+
+[build-dependencies]
+tauri-build = "1.1"
+
+[features]
+# by default Tauri runs in production mode
+# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
+default = [ "custom-protocol" ]
+# this feature is used used for production builds where `devPath` points to the filesystem
+# DO NOT remove this
+custom-protocol = [ "tauri/custom-protocol" ]

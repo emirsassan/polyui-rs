@@ -133,49 +133,5 @@ if ($ci -eq $True) {
    Start-Process "$temp\llvm.exe" -Wait
 }
 
-
-
-Write-Host
-Write-Host "Downloading the latest ffmpeg build..." -ForegroundColor Yellow
-
-# Downloads the latest shared build of ffmpeg from GitHub
-# $filenamePattern = "*-full_build-shared.zip"
-# $releasesUri = "https://api.github.com/repos/GyanD/codexffmpeg/releases/latest"
-$downloadUri = "https://github.com/GyanD/codexffmpeg/releases/download/5.0.1/ffmpeg-5.0.1-full_build-shared.zip" # ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url
-$filename = "ffmpeg-5.0.1-full_build-shared.zip" # ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).name
-$remove = ".zip"
-$foldername = $filename.Substring(0, ($filename.Length - $remove.Length))
-
-Start-BitsTransfer -Source $downloadUri -Destination "$temp\ffmpeg.zip"
-
-Write-Host
-Write-Host "Expanding ffmpeg zip..." -ForegroundColor Yellow
-
-Expand-Archive "$temp\ffmpeg.zip" $HOME -ErrorAction SilentlyContinue
-
-Remove-Item "$temp\ffmpeg.zip"
-
-Write-Host
-Write-Host "Setting environment variables..." -ForegroundColor Yellow
-
-if ($ci -eq $True) {
-   # If running in ci, we need to use GITHUB_ENV and GITHUB_PATH instead of the normal PATH env variables, so we set them here
-   Add-Content $env:GITHUB_ENV "FFMPEG_DIR=$HOME\$foldername`n"
-   Add-Content $env:GITHUB_PATH "$HOME\$foldername\bin`n" 
-}
-else {
-   # Sets environment variable for ffmpeg
-   [System.Environment]::SetEnvironmentVariable('FFMPEG_DIR', "$HOME\$foldername", [System.EnvironmentVariableTarget]::User)
-}
-
-Write-Host
-Write-Host "Copying Required .dll files..." -ForegroundColor Yellow
-
-# Create target\debug folder, continue if already exists
-New-Item -Path $currentLocation\target\debug -ItemType Directory -ErrorAction SilentlyContinue
-
-# Copies all .dll required for rust-ffmpeg to target\debug folder
-Get-ChildItem "$HOME\$foldername\bin" -recurse -filter *.dll | Copy-Item -Destination "$currentLocation\target\debug"
-
 Write-Host
 Write-Host "Your machine has been setup for PolyUI development!"
