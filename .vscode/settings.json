@@ -3,5 +3,13 @@
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
 	"rust-analyzer.procMacro.enable": true,
-	"rust-analyzer.diagnostics.experimental.enable": false
+	"rust-analyzer.diagnostics.experimental.enable": false,
+	"rust-analyzer.files.excludeDirs": [
+		"node_modules",
+		"dist",
+		"cache",
+		"target",
+		"cli",
+		".turbo"
+	]
 }
