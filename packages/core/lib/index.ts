@@ -1,1 +1,1 @@
-export * from './util/LoggerUtil'
+export * from './util/LoggerUtil';

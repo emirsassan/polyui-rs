@@ -10,7 +10,7 @@ edition = "2021"
 build = "build.rs"
 
 [dependencies]
-tauri = { version = "1.1.1" }
+tauri = { version = "1.1.1", features = ["api-all"] }
 polyui-core = { path = "../../../core" }
 tokio = { version = "1.21.2" }
 window-shadows = "0.2.0"
@@ -18,7 +18,7 @@ tracing = "0.1.36"
 serde = "1.0.145"
 
 [build-dependencies]
-tauri-build = "1.1"
+tauri-build = { version = "1.1.1", features = [] }
 
 [features]
 # by default Tauri runs in production mode

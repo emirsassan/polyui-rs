@@ -1,14 +1,14 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "apps/desktop"
-    },
-    {
-      "path": "apps/website"
-    },
-    {
-      "path": "packages/ui"
-    }
-  ]
+	"files": [],
+	"references": [
+		{
+			"path": "apps/desktop"
+		},
+		{
+			"path": "apps/website"
+		},
+		{
+			"path": "packages/ui"
+		}
+	]
 }

@@ -1,1 +1,1 @@
-export * from './common/rest/RestResponse'
+export * from './common/rest/RestResponse';
