@@ -138,11 +138,12 @@ importers:
     specifiers:
       '@polyui/config': workspace:*
       '@types/events': ^3.0.0
-      '@types/three': ^0.129.0
+      '@types/three': ^0.129
       '@types/webpack': 5.28.0
       blockbench-types: ^4.5.0
       events: ^3.3.0
       terser-webpack-plugin: ^5.3.6
+      three: ^0.129
       ts-loader: ^9.4.2
       typescript: ^4.9.3
       webpack: ^5.75.0
@@ -156,6 +157,7 @@ importers:
       '@types/webpack': 5.28.0_webpack-cli@5.0.0
       blockbench-types: 4.5.0
       terser-webpack-plugin: 5.3.6_webpack@5.75.0
+      three: 0.129.0
       ts-loader: 9.4.2_typescript@4.9.3+webpack@5.75.0
       typescript: 4.9.3
       webpack: 5.75.0_webpack-cli@5.0.0

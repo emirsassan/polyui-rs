@@ -1,5 +1,7 @@
-import THREE from 'three';
-import { cubes } from '../utils'
+/// <reference types="blockbench-types" />
+
+import { cubes } from '../utils';
+import THREE from 'three'
 
 export async function getPolyModel() {
 	const greyscale = new Uint8Array(4);
@@ -18,65 +20,86 @@ export async function getPolyModel() {
 	model.position.x = 0.001;
 	model.position.y = 0.001;
 	model.position.z = 0.001;
-    
-    for (const cube of cubes) {
-        const mesh = new THREE.Mesh(new THREE.BoxGeometry(...cube.size), material)
-        if (cube.origin) {
-          mesh.position.set(cube.origin[0], cube.origin[1], cube.origin[2])
-          mesh.geometry.translate(-cube.origin[0], -cube.origin[1], -cube.origin[2])
-        }
-        mesh.geometry.translate(cube.pos[0], cube.pos[1], cube.pos[2])
-        for (const [key, face] of Object.entries(cube)) {
-          if (face.uv !== undefined) {
-            let fIndex = 0;
-            switch(key) {
-              case "north": fIndex = 10; break
-              case "east": fIndex = 0; break
-              case "south": fIndex = 8; break
-              case "west": fIndex = 2; break
-              case "up": fIndex = 4; break
-              case "down": fIndex = 6; break
-            }
-            const uv_array = [
-              [face.uv[0] / 16, 1 - (face.uv[1] / 16)],
-              [face.uv[2] / 16, 1 - (face.uv[1] / 16)],
-              [face.uv[0] / 16, 1 - (face.uv[3] / 16)],
-              [face.uv[2] / 16, 1 - (face.uv[3] / 16)]
-            ]
-            mesh.geometry.attributes.uv = mesh.geometry.attributes.uv as THREE.BufferAttribute
-            mesh.geometry.attributes.uv.set(uv_array[0], fIndex * 4 + 0)
-            mesh.geometry.attributes.uv.set(uv_array[1], fIndex * 4 + 2)
-            mesh.geometry.attributes.uv.set(uv_array[2], fIndex * 4 + 4)
-            mesh.geometry.attributes.uv.set(uv_array[3], fIndex * 4 + 6)
-            mesh.geometry.attributes.uv.needsUpdate = true
-          }
-        }
-        model.add(mesh)
-      }
-      if (Settings.get("display_skin")) {
-        let val = Settings.get("display_skin") as string
-        if (val.startsWith("username:")) {
-          fetch(`https://api.mojang.com/users/profiles/minecraft/${val.slice(9)}`).then(async r => {
-            const uuid = await r.json()
-            if (uuid?.id) {
-              fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid.id}`).then(async r => {
-                const data = await r.json()
-                model.children[0].material.map = await getTexture(JSON.parse(Buffer.from(data.properties[0].value, "base64").toString()).textures.SKIN.url)
-              })
-            }
-          })
-        } else {
-          if (val.slice(1, 2) === ",") val = val.slice(2)
-          try {
-            model.children[0].material.map = await getTexture(val)
-          } catch(err) {
-            console.log(err)
-          }
-        }
-      }
+
+	for (const cube of cubes) {
+		const mesh = new THREE.Mesh(new THREE.BoxGeometry(...cube.size), material);
+		if (cube.origin) {
+			mesh.position.set(cube.origin[0], cube.origin[1], cube.origin[2]);
+			mesh.geometry.translate(-cube.origin[0], -cube.origin[1], -cube.origin[2]);
+		}
+		mesh.geometry.translate(cube.pos[0], cube.pos[1], cube.pos[2]);
+		for (const [key, face] of Object.entries(cube)) {
+			if (face.uv !== undefined) {
+				let fIndex = 0;
+				switch (key) {
+					case 'north':
+						fIndex = 10;
+						break;
+					case 'east':
+						fIndex = 0;
+						break;
+					case 'south':
+						fIndex = 8;
+						break;
+					case 'west':
+						fIndex = 2;
+						break;
+					case 'up':
+						fIndex = 4;
+						break;
+					case 'down':
+						fIndex = 6;
+						break;
+				}
+				const uv_array = [
+					[face.uv[0] / 16, 1 - face.uv[1] / 16],
+					[face.uv[2] / 16, 1 - face.uv[1] / 16],
+					[face.uv[0] / 16, 1 - face.uv[3] / 16],
+					[face.uv[2] / 16, 1 - face.uv[3] / 16]
+				];
+				mesh.geometry.attributes.uv = mesh.geometry.attributes.uv as THREE.BufferAttribute;
+				mesh.geometry.attributes.uv.set(uv_array[0], fIndex * 4 + 0);
+				mesh.geometry.attributes.uv.set(uv_array[1], fIndex * 4 + 2);
+				mesh.geometry.attributes.uv.set(uv_array[2], fIndex * 4 + 4);
+				mesh.geometry.attributes.uv.set(uv_array[3], fIndex * 4 + 6);
+				mesh.geometry.attributes.uv.needsUpdate = true;
+			}
+		}
+		model.add(mesh);
+	}
+	if (Settings.get('display_skin')) {
+		let val = Settings.get('display_skin') as string;
+		if (val.startsWith('username:')) {
+			fetch(`https://api.mojang.com/users/profiles/minecraft/${val.slice(9)}`).then(async (r) => {
+				const uuid = await r.json();
+				if (uuid?.id) {
+					fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid.id}`).then(
+						async (r) => {
+							const data = await r.json();
+							if (model.children[0] instanceof THREE.Mesh)
+								model.children[0].material.map = await getTexture(
+									JSON.parse(Buffer.from(data.properties[0].value, 'base64').toString()).textures
+										.SKIN.url
+								);
+						}
+					);
+				}
+			});
+		} else {
+			if (val.slice(1, 2) === ',') val = val.slice(2);
+			try {
+				if (model.children[0] instanceof THREE.Mesh)
+					model.children[0].material.map = await getTexture(val);
+			} catch (err) {
+				console.log(err);
+			}
+		}
+	}
+
+	return model;
 }
 
-export async function getTexture(path: string) {
+export async function getTexture(path: string): Promise<THREE.CanvasTexture> {
 	const texture = (await new Promise((fulfill) =>
 		new THREE.TextureLoader().load(path, fulfill, undefined, fulfill)
 	)) as unknown as THREE.Texture;

@@ -23,7 +23,7 @@ export const groups = [
 		name: 'rightLeg',
 		origin: [1.95, 12, 0]
 	}
-];
+] as GroupOptions[];
 
 export const groupNames = groups.map((e) => e.name);
 
