@@ -5,10 +5,13 @@
 			"path": "apps/desktop"
 		},
 		{
-			"path": "apps/website"
+			"path": "apps/landing"
 		},
 		{
 			"path": "packages/ui"
+		},
+		{
+			"path": "apps/client"
 		}
 	]
 }

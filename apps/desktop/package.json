@@ -12,16 +12,16 @@
 	"dependencies": {
 		"@polyui/interface": "workspace:*",
 		"@polyui/ui": "workspace:*",
-		"@tauri-apps/api": "^1.1.0",
-		"vue": "^3.2.41"
+		"@tauri-apps/api": "^1.2.0",
+		"vue": "^3.2.45"
 	},
 	"devDependencies": {
-		"@tauri-apps/cli": "^1.1.1",
+		"@tauri-apps/cli": "^1.2.1",
 		"@vitejs/plugin-vue": "^3.2.0",
-		"concurrently": "^7.5.0",
-		"prettier": "^2.7.1",
-		"sass": "^1.55.0",
-		"typescript": "^4.8.4",
-		"vite": "^3.2.2"
+		"concurrently": "^7.6.0",
+		"prettier": "^2.8.0",
+		"sass": "^1.56.1",
+		"typescript": "^4.9.3",
+		"vite": "^3.2.4"
 	}
 }

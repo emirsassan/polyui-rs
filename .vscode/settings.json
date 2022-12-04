@@ -6,9 +6,9 @@
 	"rust-analyzer.diagnostics.experimental.enable": false,
 	"rust-analyzer.files.excludeDirs": ["node_modules", "dist", "cache", "target", "cli", ".turbo"],
 	"tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
 		"tw`([^`]*)",
-    "tw\\.[^`]+`([^`]*)`",
-    "tw\\(.*?\\).*?`([^`]*)"
-	],
+		"tw\\.[^`]+`([^`]*)`",
+		"tw\\(.*?\\).*?`([^`]*)"
+	]
 }

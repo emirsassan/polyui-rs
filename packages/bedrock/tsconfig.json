@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"target": "ES6",
+        "lib": ["ES6", "DOM"],
+        "module": "CommonJS",
+        "rootDir": "src",
+		"allowJs": true,
+        "declaration": false,
+        "sourceMap": true,
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "skipLibCheck": true,
+        "removeComments": true
+	},
+	"include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}

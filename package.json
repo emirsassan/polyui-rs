@@ -11,15 +11,16 @@
 		"ui": "pnpm --filter @polyui/ui -- ",
 		"interface": "pnpm --filter @polyui/interface -- ",
 		"core": "pnpm --filter @polyui/core -- ",
-		"plugin": "pnpm --filter @polyui/core -- ",
+		"landing": "pnpm --filter @polyui/landing --",
+		"bedrock": "pnpm --filter @polyui/bedrock --",
 		"typecheck": "pnpm -r exec tsc"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^3.4.0",
-		"prettier": "^2.7.1",
+		"prettier": "^2.8.0",
 		"turbo": "^1.6.3",
 		"turbo-ignore": "^0.3.0",
-		"typescript": "^4.8.4"
+		"typescript": "^4.9.3"
 	},
 	"overrides": {
 		"@types/node": "^16.0.0"
