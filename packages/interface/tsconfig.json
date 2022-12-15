@@ -1,0 +1,4 @@
+{
+	"extends": "@polyui/config/interface.tsconfig.json",
+	"include": ["src"]
+}

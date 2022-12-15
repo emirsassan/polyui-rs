@@ -1,0 +1,17 @@
+{
+	"name": "@polyui/config",
+	"version": "0.0.0",
+	"main": "index.js",
+	"files:": [
+		"eslint-config.js"
+	],
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.46.1",
+		"@typescript-eslint/parser": "^5.46.1",
+		"eslint": "^8.29.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-react": "^7.31.11",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"typescript": "^4.9.4"
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"files": [],
+	"references": [
+		{
+			"path": "apps/desktop"
+		},
+		{
+			"path": "apps/landing"
+		},
+		{
+			"path": "packages/client"
+		},
+		{
+			"path": "packages/interface"
+		},
+		{
+			"path": "packages/ui"
+		}
+	]
+}

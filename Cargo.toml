@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "core",
+    "apps/desktop/src-tauri"
+]
+resolver = "2"
+
+[workspace.dependencies]
+rspc = { version = "0.1.2" }
+normi = { version = "0.0.1" }
+specta = { version = "0.0.4" }
+
+[patch.crates-io]
+rspc = { git = "https://github.com/oscartbeaumont/rspc", rev = "73d60f9cb901661f9f0f8e953477b3558f2715d1" }
+normi = { git = "https://github.com/oscartbeaumont/rspc", rev = "73d60f9cb901661f9f0f8e953477b3558f2715d1" }
+specta = { git = "https://github.com/oscartbeaumont/rspc", rev = "73d60f9cb901661f9f0f8e953477b3558f2715d1" }

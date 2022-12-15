@@ -1,0 +1,32 @@
+{
+	"name": "@polyui/client",
+	"version": "0.0.0",
+	"private": true,
+	"files": [
+		"dist/**"
+	],
+	"main": "src/index.ts",
+	"scripts": {
+		"test": "jest",
+		"lint": "TIMING=1 eslint src --fix",
+		"clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+	},
+	"dependencies": {
+		"@polyui/config": "workspace:*",
+		"@rspc/client": "^0.0.0-main-7c0a67c1",
+		"@rspc/react": "^0.0.0-main-7c0a67c1",
+		"@tanstack/react-query": "^4.20.4",
+		"react": "^18.2.0",
+		"valtio": "^1.7.4"
+	},
+	"devDependencies": {
+		"@types/node": "^18.11.15",
+		"@types/react": "^18.0.21",
+		"scripts": "*",
+		"tsconfig": "*",
+		"typescript": "^4.8.4"
+	},
+	"peerDependencies": {
+		"react": "^18.2.0"
+	}
+}

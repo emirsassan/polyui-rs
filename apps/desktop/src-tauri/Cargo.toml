@@ -1,0 +1,6 @@
+[package]
+name = "onelauncher"
+version = "0.1.0" 
+authors = ["Polyfrost"]
+edition = "2021"
+build = "build.rs"
