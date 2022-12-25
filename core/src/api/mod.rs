@@ -4,6 +4,7 @@ use std::{
 };
 
 use crate::{
+	helpers::HelpersManager,
 	job::JobManager,
 	library::LibraryManager,
 	node::{NodeConfig, NodeConfigManager},
@@ -25,6 +26,7 @@ pub enum CoreEvent {
 
 pub struct Ctx {
 	pub library_manager: Arc<LibraryManager>,
+	pub helpers_manager: Arc<HelpersManager>,
 	pub config: Arc<NodeConfigManager>,
 	pub jobs: Arc<JobManager>,
 	pub event_bus: broadcast::Sender<CoreEvent>,
@@ -35,6 +37,7 @@ mod java;
 mod jobs;
 mod launcher;
 mod libraries;
+mod microsoft;
 mod minecraft;
 mod normi;
 pub mod utils;
@@ -78,13 +81,12 @@ pub(crate) fn mount() -> Arc<Router> {
 		})
 		.merge("library.", libraries::mount())
 		.merge("jobs.", jobs::mount())
-		/*
-		.merge("instance.", instance::mount())
 		.merge("normi.", normi::mount())
+		.merge("instance.", instance::mount())
 		.merge("minecraft.", minecraft::mount())
 		.merge("java.", java::mount())
 		.merge("launcher.", launcher::mount())
-		*/
+		.merge("microsoft.", microsoft::mount())
 		.subscription("invalidateQuery", |t| {
 			t(|ctx, _: ()| {
 				let mut event_bus_rx = ctx.event_bus.subscribe();

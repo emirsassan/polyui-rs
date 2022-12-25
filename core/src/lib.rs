@@ -1,4 +1,5 @@
 use api::{CoreEvent, Ctx, Router};
+use helpers::HelpersManager;
 use job::JobManager;
 use library::LibraryManager;
 use node::NodeConfigManager;
@@ -12,6 +13,9 @@ use tracing::{error, info};
 use tracing_subscriber::{prelude::*, EnvFilter};
 
 pub mod api;
+pub(crate) mod entities;
+pub(crate) mod handler;
+pub(crate) mod helpers;
 pub(crate) mod job;
 pub(crate) mod library;
 pub(crate) mod node;
@@ -29,6 +33,7 @@ pub struct NodeContext {
 pub struct Node {
 	config: Arc<NodeConfigManager>,
 	library_manager: Arc<LibraryManager>,
+	helpers_manager: Arc<HelpersManager>,
 	jobs: Arc<JobManager>,
 	event_bus: (broadcast::Sender<CoreEvent>, broadcast::Receiver<CoreEvent>),
 }
@@ -80,6 +85,12 @@ impl Node {
 			},
 		)
 		.await?;
+		let helpers_manager = HelpersManager::new(NodeContext {
+			config: Arc::clone(&config),
+			jobs: Arc::clone(&jobs),
+			event_bus_tx: event_bus.0.clone(),
+		})
+		.await;
 
 		let inner_library_manager = Arc::clone(&library_manager);
 		let inner_jobs = Arc::clone(&jobs);
@@ -95,6 +106,7 @@ impl Node {
 		let node = Node {
 			config,
 			library_manager,
+			helpers_manager,
 			jobs,
 			event_bus,
 		};
@@ -105,6 +117,7 @@ impl Node {
 	pub fn get_request_context(&self) -> Ctx {
 		Ctx {
 			library_manager: Arc::clone(&self.library_manager),
+			helpers_manager: Arc::clone(&self.helpers_manager),
 			config: Arc::clone(&self.config),
 			jobs: Arc::clone(&self.jobs),
 			event_bus: self.event_bus.0.clone(),

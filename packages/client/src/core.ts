@@ -9,7 +9,13 @@ export type Procedures = {
         { key: "jobs.isRunning", input: LibraryArgs<null>, result: boolean } | 
         { key: "library.getStatistics", input: LibraryArgs<null>, result: Statistics } | 
         { key: "library.list", input: never, result: Array<LibraryConfigWrapped> } | 
-        { key: "nodeState", input: never, result: NodeState },
+        { key: "microsoft.get_msauth_token", input: never, result: string } | 
+        { key: "nodeState", input: never, result: NodeState } | 
+        { key: "normi.composite", input: never, result: NormalisedCompositeId } | 
+        { key: "normi.org", input: never, result: NormalisedOrganisation } | 
+        { key: "normi.user", input: never, result: NormalisedUser } | 
+        { key: "normi.userSync", input: never, result: NormalisedUser } | 
+        { key: "normi.version", input: never, result: string },
     mutations: 
         { key: "library.create", input: string, result: LibraryConfigWrapped } | 
         { key: "library.delete", input: string, result: null } | 
@@ -39,5 +45,13 @@ export interface LibraryConfigWrapped { uuid: string, config: LibraryConfig }
 export interface NodeConfig { version: string | null, id: string, name: string }
 
 export interface NodeState { version: string | null, id: string, name: string, data_path: string }
+
+export interface NormalisedCompositeId { $type: string, $id: any, org_id: string, user_id: string }
+
+export interface NormalisedOrganisation { $type: string, $id: any, id: string, name: string, users: NormalizedVec<NormalisedUser>, owner: NormalisedUser, non_normalised_data: Array<null> }
+
+export interface NormalisedUser { $type: string, $id: any, id: string, name: string }
+
+export interface NormalizedVec<T> { $type: string, edges: Array<T> }
 
 export interface Statistics { id: number, date_captured: string, total_instance_count: number, library_db_size: string, total_bytes_used: string, oneconfig_stats: string }
