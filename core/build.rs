@@ -1,7 +1,7 @@
 use std::process::Command;
 
 fn main() {
-    let output = Command::new("git")
+	let output = Command::new("git")
 		.args(&["rev-parse", "--short", "HEAD"])
 		.output()
 		.expect("error getting git hash. Does `git rev-parse --short HEAD` work for you?");

@@ -1,0 +1,4 @@
+Contact: mailto:proxy@ethanlibs.co
+Expires: 2025-01-01T00:00:00.000Z
+Canonical: https://polyfrost.cc/.well-known/security.txt
+Canonical: https://polyfrost.cc/security.txt

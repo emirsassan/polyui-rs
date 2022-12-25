@@ -6,7 +6,6 @@ export type OperatingSystem = 'browser' | 'linux' | 'macOS' | 'windows' | 'unkno
 // This could be Tauri or web.
 export type Platform = {
 	platform: 'web' | 'tauri'; // This represents the specific platform implementation
-	getThumbnailUrlById: (casId: string) => string;
 	openLink: (url: string) => void;
 	demoMode?: boolean;
 	getOs?(): Promise<OperatingSystem>;

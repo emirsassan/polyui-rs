@@ -1,4 +1,3 @@
-/*
 use std::sync::Arc;
 
 use futures::Stream;
@@ -19,7 +18,6 @@ pub(crate) struct LibraryArgs<T> {
 	pub library_id: Uuid,
 	pub arg: T,
 }
-
 
 pub trait LibraryRequest {
 	fn library_query<TUnbuiltResolver, TUnbuiltResult, TUnbuiltResultMarker, TBuiltResolver, TArg>(
@@ -171,10 +169,7 @@ where
 		self.subscription(key, |t| {
 			let resolver = Arc::new(builder(UnbuiltProcedureBuilder::from_builder(&t)).resolver);
 
-			t(move |ctx, arg: LibraryArgs<TArg>| {
-				resolver(ctx, arg.arg, arg.library_id)
-			})
+			t(move |ctx, arg: LibraryArgs<TArg>| resolver(ctx, arg.arg, arg.library_id))
 		})
 	}
 }
-*/

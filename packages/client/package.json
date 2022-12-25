@@ -20,7 +20,7 @@
 		"valtio": "^1.7.4"
 	},
 	"devDependencies": {
-		"@types/node": "^18.11.15",
+		"@types/node": "^18.11.17",
 		"@types/react": "^18.0.21",
 		"scripts": "*",
 		"tsconfig": "*",

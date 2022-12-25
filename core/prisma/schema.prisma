@@ -1,0 +1,101 @@
+datasource db {
+    provider = "sqlite"
+    url = "file:dev.db"
+}
+
+generator client {
+    provider = "cargo prisma"
+    output = "../src/prisma.rs"
+}
+
+model SyncEvent {
+    id Int @id @default(autoincrement())
+    node_id Int
+    timestamp String
+    record_id Bytes
+    kind Int
+    colum String?
+    value String
+
+    node Node @relation(fields: [node_id], references: [id])
+
+    @@map("sync_event")
+}
+
+model Statistics {
+    id Int @id @default(autoincrement())
+    date_captured DateTime @default(now())
+    total_instance_count Int @default(0)
+    library_db_size String @default("0")
+    total_bytes_used String @default("0")
+    oneconfig_stats String @default("{}")
+    
+    @@map("statistics")
+}
+
+model Node {
+    id Int @id @default(autoincrement())
+    pub_id Bytes @unique
+    name String
+    platform Int @default(0)
+    version String?
+    last_seen DateTime @default(now())
+    timezone String?
+    date_created DateTime @default(now())
+
+    sync_events SyncEvent[]
+    jobs Job[]
+
+    instance Instance[]
+
+    @@map("node")
+}
+
+model Instance {
+    id Int @id @default(autoincrement())
+    pub_id Bytes @unique
+    node_id Int
+    name String?
+    mc_path String?
+    mc_version String?
+    mc_platform Int?
+    mc_plugins MinecraftResource[]
+    shared Bytes?
+
+    node Node @relation(fields: [node_id], references: [id])
+
+    @@map("instance")
+}
+
+model MinecraftResource {
+    id Int
+    instance_id Int
+    path String
+    name String
+    mc_platform Int
+    
+    instance Instance? @relation(fields: [instance_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    @@id([instance_id, id])
+    @@unique([instance_id, path, name, mc_platform])
+    @@index([instance_id])
+    @@map("minecraft_resource")
+}
+
+model Job {
+    id Bytes @id
+    name String
+    node_id Int
+    action Int
+    status Int @default(0)
+    data Bytes?
+    metadata Bytes?
+
+    task_count           Int      @default(1)
+    completed_task_count Int      @default(0)
+    date_created         DateTime @default(now())
+    date_modified        DateTime @default(now())
+    seconds_elapsed      Int      @default(0)
+    nodes Node @relation(fields: [node_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    @@map("job")
+}
