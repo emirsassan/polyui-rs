@@ -46,14 +46,13 @@ model Node {
     sync_events SyncEvent[]
     jobs Job[]
 
-    instance Instance[]
+    location Location[]
 
     @@map("node")
 }
 
 model Instance {
     id Int @id @default(autoincrement())
-    pub_id Bytes @unique
     node_id Int
     name String?
     mc_path String?
@@ -62,9 +61,23 @@ model Instance {
     mc_plugins MinecraftResource[]
     shared Bytes?
 
+    @@unique([node_id, name])
+    @@map("instance")
+}
+
+model Location {
+    id Int @id @default(autoincrement())
+    pub_id Bytes @unique
+    node_id Int
+    name String?
+    local_path String?
+    is_online Boolean @default(true)
+    is_archived Boolean @default(false)
+    date_created DateTime @default(now())
+
     node Node @relation(fields: [node_id], references: [id])
 
-    @@map("instance")
+    @@map("location")
 }
 
 model MinecraftResource {
