@@ -3,9 +3,11 @@ use thiserror::Error;
 
 use crate::{entities::microsoft::XboxLiveSTSAuthorizeResponse, NodeContext};
 
-use self::msauth::MSAuthError;
+use self::microsoft::MSAuthError;
 
-mod msauth;
+mod microsoft;
+mod launch;
+mod java;
 
 pub struct HelpersManager {
 	node_context: NodeContext,
@@ -49,7 +51,7 @@ impl HelpersManager {
 	pub(crate) async fn run_ms_auth(
 		&self,
 	) -> Result<XboxLiveSTSAuthorizeResponse, HelpersManagerError> {
-		let token = msauth::login_flow()
+		let token = microsoft::login_flow()
 			.await
 			.map_err(|err| HelpersManagerError::MSAuthHelper(err));
 		return token;

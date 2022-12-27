@@ -1,0 +1,9 @@
+# plugin for a json config so evelyn doesnt kill me over the funny squlite db uwu owo
+[package]
+name = "polyui-json"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = "1.0.145"
+serde_json = "1.0.85"
