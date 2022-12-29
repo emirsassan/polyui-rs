@@ -1,0 +1,49 @@
+:root {
+    --color-bg: hsl(220, 13%, 10%);
+    --color-fg: hsl(221, 39%, 90%);
+    --color-section-bg: hsl(220, 13%, 19%);
+
+    --content-width: 30%;
+    --content-max-width: 300px;
+    --content-padding: .75rem;
+    --edge-rounding: 1rem;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    color: var(--color-fg);
+    background-color: var(--color-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica Neue, Helvetica,
+    Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, 'Apple Color Emoji', 'Segoe UI Emoji',
+    Arial, sans-serif;
+}
+
+.content {
+    background-color: var(--color-section-bg);
+    width: var(--content-width);
+    max-width: var(--content-max-width);
+    border-radius: var(--edge-rounding);
+    padding: var(--content-padding);
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.content h4 {
+    margin-bottom: 0;
+}
+
+.logo {
+    display: block;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}

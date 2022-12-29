@@ -1,7 +1,11 @@
-use super::RouterBuilder;
+use super::{RouterBuilder, Ctx};
+use tokio::sync::oneshot::Sender;
 
 pub(crate) fn mount() -> RouterBuilder {
-	<RouterBuilder>::new().query("get_msauth_token", |t| {
-		t(|ctx, _: ()| async move { "token" })
-	})
+	<RouterBuilder>::new()
+		.mutation("authenticate", |t| {
+			t(|ctx: Ctx, browser_url: Sender<url::Url>| async move {
+				Ok(crate::helpers::msapi::authenticate(browser_url).await?)
+			})
+		})
 }

@@ -4,7 +4,6 @@ use std::{
 };
 
 use crate::{
-	helpers::HelpersManager,
 	job::JobManager,
 	library::LibraryManager,
 	node::{NodeConfig, NodeConfigManager},
@@ -26,7 +25,6 @@ pub enum CoreEvent {
 
 pub struct Ctx {
 	pub library_manager: Arc<LibraryManager>,
-	pub helpers_manager: Arc<HelpersManager>,
 	pub config: Arc<NodeConfigManager>,
 	pub jobs: Arc<JobManager>,
 	pub event_bus: broadcast::Sender<CoreEvent>,
@@ -41,6 +39,22 @@ mod microsoft;
 mod minecraft;
 mod normi;
 pub mod utils;
+
+pub mod data {
+	pub use crate::state::{
+		DirectoryInfo, Hooks, JavaSettings, MemorySettings, ModLoader,
+        ProfileMetadata, Settings, WindowSize,
+	};
+}
+
+pub mod prelude {
+	pub use crate::{
+		entities::launcher::msapi::{self, Credentials},
+		api::data::*,
+		state::profiles::Profile,
+		state::State,
+	};
+}
 
 #[derive(Serialize, Deserialize, Debug, Type)]
 struct NodeState {

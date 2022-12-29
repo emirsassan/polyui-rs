@@ -17,10 +17,10 @@
 		"@rspc/react": "^0.0.0-main-7c0a67c1",
 		"@tanstack/react-query": "^4.20.4",
 		"react": "^18.2.0",
-		"valtio": "^1.7.4"
+		"valtio": "^1.8.0"
 	},
 	"devDependencies": {
-		"@types/node": "^18.11.17",
+		"@types/node": "^18.11.18",
 		"@types/react": "^18.0.21",
 		"scripts": "*",
 		"tsconfig": "*",
