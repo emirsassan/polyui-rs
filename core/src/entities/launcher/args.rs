@@ -1,6 +1,6 @@
 use super::{msapi::Credentials, parse_rule};
 use crate::{
-    state::settings::{MemorySettings, WindowSize},
+    state::{MemorySettings, WindowSize},
     utils::platform::classpath_separator,
 };
 use daedalus::{

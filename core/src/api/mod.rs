@@ -51,8 +51,9 @@ pub mod prelude {
 	pub use crate::{
 		entities::launcher::msapi::{self, Credentials},
 		api::data::*,
-		state::profiles::Profile,
+		state::Profile,
 		state::State,
+		helpers::*,
 	};
 }
 

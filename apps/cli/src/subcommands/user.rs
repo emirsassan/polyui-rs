@@ -1,3 +1,4 @@
+//! User management subcommand
 use crate::utils::{confirm_async, table};
 use eyre::Result;
 use paris::*;
@@ -23,7 +24,7 @@ pub enum UserSubcommand {
 }
 
 #[derive(argh::FromArgs, Debug)]
-/// add a new user to Theseus
+/// add a new user to OneLauncher
 #[argh(subcommand, name = "add")]
 pub struct UserAdd {
     #[argh(option)]
@@ -41,7 +42,7 @@ impl UserAdd {
         info!("A browser window will now open, follow the login flow there.");
 
         let (tx, rx) = oneshot::channel::<url::Url>();
-        let flow = tokio::spawn(auth::authenticate(tx));
+        let flow = tokio::spawn(authenticate(tx));
 
         let url = rx.await?;
         match self.browser {
@@ -90,7 +91,7 @@ impl UserList {
         let state = State::get().await?;
         let default = state.settings.read().await.default_user;
 
-        let users = auth::users().await?;
+        let users = users().await?;
         let rows = users.iter().map(|user| UserRow::from(user, default));
 
         let table = table(rows);
@@ -118,10 +119,10 @@ impl UserRemove {
         info!("Removing user {}", self.user.as_hyphenated());
 
         if confirm_async(String::from("Do you wish to continue"), true).await? {
-            if !auth::has_user(self.user).await? {
+            if !has_user(self.user).await? {
                 warn!("Profile was not managed by OneLauncher!");
             } else {
-                auth::remove_user(self.user).await?;
+                remove_user(self.user).await?;
                 State::sync().await?;
                 success!("User removed!");
             }
@@ -134,8 +135,10 @@ impl UserRemove {
 }
 
 #[derive(argh::FromArgs, Debug)]
+/// set the default user
 #[argh(subcommand, name = "set-default")]
 pub struct UserDefault {
+    /// the user to set as default
     #[argh(positional)]
     user: uuid::Uuid,
 }
@@ -148,6 +151,7 @@ impl UserDefault {
     ) -> Result<()> {
         info!("Setting user {} as default", self.user.as_hyphenated());
 
+        // TODO: settings API
         let state: std::sync::Arc<State> = State::get().await?;
         let mut settings = state.settings.write().await;
 

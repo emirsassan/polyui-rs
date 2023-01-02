@@ -5,7 +5,7 @@ use tokio::sync::oneshot;
 pub use inner::Credentials;
 
 #[tracing::instrument]
-pub(crate) async fn authenticate(
+pub async fn authenticate(
     browser_url: oneshot::Sender<url::Url>,
 ) -> crate::error::Result<Credentials> {
     let mut flow = inner::PolyAuthFlow::new().await?;

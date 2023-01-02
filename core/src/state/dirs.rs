@@ -8,7 +8,7 @@ pub struct DirectoryInfo {
 }
 
 impl DirectoryInfo {
-    /// Get all paths needed for the launcher to operate properly
+    /// Get all paths needed for OneLauncher to operate properly
     #[tracing::instrument]
     pub async fn init() -> crate::error::Result<Self> {
         // Working directory
@@ -115,7 +115,7 @@ impl DirectoryInfo {
         self.config_dir.join("data.bin")
     }
 
-    /// Get the settings file for Theseus
+    /// Get the settings file for OneLauncher
     #[inline]
     pub fn settings_file(&self) -> PathBuf {
         self.config_dir.join("settings.json")

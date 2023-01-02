@@ -1,18 +1,20 @@
-use crate::utils::{
+//! Profile management subcommand
+use crate::{utils::{
     confirm_async, prompt_async, select_async, table, table_path_display,
-};
+}, subcommands::profile};
 use daedalus::modded::LoaderVersion;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
 use std::path::{Path, PathBuf};
-use tabled::Table;
+use tabled::Tabled;
 use polyui_core::api::prelude::*;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]
+/// manage Minecraft instances
 pub struct ProfileCommand {
     #[argh(subcommand)]
     action: ProfileSubcommand,
@@ -28,6 +30,8 @@ pub enum ProfileSubcommand {
     Run(ProfileRun),
 }
 
+#[derive(argh::FromArgs, Debug)]
+#[argh(subcommand, name = "add")]
 /// add a new profile to OneLauncher
 pub struct ProfileAdd {
     #[argh(positional, default = "std::env::current_dir().unwrap()")]
@@ -101,6 +105,7 @@ impl ProfileInit {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
+        // TODO: validate inputs from args early
         let state = State::get().await?;
 
         if self.path.exists() {
@@ -248,7 +253,7 @@ impl ProfileInit {
         State::sync().await?;
 
         success!(
-            "Successfully created instance, it is now available to use!"
+            "Successfully created instance, it is now available to use with OneLauncher!"
         );
         Ok(())
     }
@@ -395,7 +400,7 @@ impl ProfileRun {
                     ))
             })
             .await?;
-        let credentials = auth::refresh(id, false).await?;
+        let credentials = refresh(id, false).await?;
 
         let mut proc = profile::run(&path, &credentials).await?;
         profile::wait_for(&mut proc).await?;

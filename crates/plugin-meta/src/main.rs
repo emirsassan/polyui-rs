@@ -1,10 +1,12 @@
 use log::{error, warn};
-use std::time::Duration;
+use reqwest::header::HeaderMap;
+use std::{time::Duration, collections::HashMap};
 use s3::{
     Bucket, Region,
     creds::Credentials,
-    error::S3Error,
+    error::S3Error, BucketConfiguration, bucket_ops,
 };
+use once_cell::sync::OnceCell;
 
 mod fabric;
 mod forge;
@@ -36,8 +38,39 @@ pub enum Error {
     ArcError,
 }
 
+static CLIENT: OnceCell<Bucket> = OnceCell::new();
+
 #[tokio::main]
 async fn main() {
+    let mut headers = HeaderMap::new();
+    headers.insert("x-amz-acl", "public-read".parse().unwrap());
+    let client = Bucket {
+        name: dotenvy::var("S3_BUCKET_NAME").unwrap().into(),
+        region: if &*dotenvy::var("S3_REGION").unwrap() == "r2" {
+            Region::R2 {
+                account_id: dotenvy::var("S3_URL").unwrap(),
+            }
+        } else {
+            Region::Custom {
+                region: dotenvy::var("S3_REGION").unwrap(),
+                endpoint: dotenvy::var("S3_URL").unwrap(),
+            }
+        },
+        credentials: std::sync::Arc::new(std::sync::RwLock::new(Credentials::new(
+            Some(&*dotenvy::var("S3_ACCESS_TOKEN").unwrap()),
+            Some(&*dotenvy::var("S3_SECRET").unwrap()),
+            None,
+            None,
+            None,
+        ).unwrap())),
+        extra_headers: headers,
+        extra_query: HashMap::new(),
+        request_timeout: Some(Duration::from_secs(60)),
+        path_style: false,
+        listobjects_v2: true,
+    };
+    CLIENT.set(client).unwrap();
+
     env_logger::init();
 
     if check_env_vars() {
@@ -112,30 +145,6 @@ fn check_env_vars() -> bool {
     failed
 }
 
-
-lazy_static::lazy_static! {
-    static ref CLIENT : Bucket = Bucket::new(
-        &dotenvy::var("S3_BUCKET_NAME").unwrap(),
-        if &*dotenvy::var("S3_REGION").unwrap() == "r2" {
-            Region::R2 {
-                account_id: dotenvy::var("S3_URL").unwrap(),
-            }
-        } else {
-            Region::Custom {
-                region: dotenvy::var("S3_REGION").unwrap(),
-                endpoint: dotenvy::var("S3_URL").unwrap(),
-            }
-        },
-        Credentials::new(
-            Some(&*dotenvy::var("S3_ACCESS_TOKEN").unwrap()),
-            Some(&*dotenvy::var("S3_SECRET").unwrap()),
-            None,
-            None,
-            None,
-        ).unwrap(),
-    ).unwrap();
-}
-
 pub async fn upload_file_to_bucket(
     path: String,
     bytes: Vec<u8>,
@@ -146,13 +155,13 @@ pub async fn upload_file_to_bucket(
 
     for attempt in 1..=4 {
         let result = if let Some(ref content_type) = content_type {
-            CLIENT.put_object_with_content_type(
+            CLIENT.get().unwrap().put_object_with_content_type(
                 key.clone(),
                 &bytes,
                 content_type,
             ).await
         } else {
-            CLIENT.put_object(
+            CLIENT.get().unwrap().put_object(
                 key.clone(),
                 &bytes,
             ).await

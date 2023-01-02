@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import { Helmet } from 'react-helmet';
 
-import { Bubbles } from '../components/Bubbles';
-import HomeCTA from '../components/HomeCTA';
 import NewBanner from '../components/NewBanner';
 
 interface SectionProps {
@@ -13,7 +11,7 @@ interface SectionProps {
     className?: string;
 }
 
-function Section(props: SectionProps = { orientation = 'left' }) {
+function Section(props: SectionProps = { orientation: 'left' }) {
     const info = (
 		<div className="px-4 py-10 sm:px-10">
 			{props.heading && <h1 className="text-2xl font-black sm:text-4xl">{props.heading}</h1>}
@@ -72,7 +70,6 @@ function Page() {
 					Designed for minecrap playerxs.
 				</span>
 			</p>
-			<HomeCTA />
 			<Section
 				orientation="right"
 				heading="oneconfg uwuwuwuwuwu."
@@ -91,7 +88,6 @@ function Page() {
 					</>
 				}
 			/>
-			<Bubbles />
 		</div>
 	);
 }

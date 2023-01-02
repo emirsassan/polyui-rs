@@ -1,9 +1,14 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, path::{Path, PathBuf}};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 use tokio::fs;
 
+// TODO: convert to semver
 const CURRENT_FORMAT_VERSION: u32 = 1;
 
+// Types
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(default)]
 pub struct Settings {

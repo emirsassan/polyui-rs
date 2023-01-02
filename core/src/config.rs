@@ -14,3 +14,7 @@ pub static REQWEST_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
         .build()
         .unwrap()
 });
+
+pub fn sled_config() -> sled::Config {
+    sled::Config::default().use_compression(true)
+}

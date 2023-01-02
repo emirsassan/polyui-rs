@@ -1,6 +1,5 @@
-use crate::{prisma::PrismaClient, config::BINCODE_CONFIG};
-
 use super::settings::{Hooks, MemorySettings, WindowSize};
+use crate::config::BINCODE_CONFIG;
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -15,6 +14,7 @@ const PROFILE_SUBTREE: &[u8] = b"profiles";
 
 pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 
+// TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
 pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
     "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
@@ -49,7 +49,7 @@ pub struct ProfileMetadata {
     pub format_version: u32,
 }
 
-// TODO: Quilt?
+// TODO: Quilt
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
@@ -113,6 +113,8 @@ impl Profile {
         })
     }
 
+    // TODO: deduplicate these builder methods
+    // They are flat like this in order to allow builder-style usage
     #[tracing::instrument]
     pub fn with_name(&mut self, name: String) -> &mut Self {
         self.metadata.name = name;
@@ -196,9 +198,160 @@ impl Profile {
 }
 
 impl Profiles {
-    pub async fn init(db: PrismaClient) -> crate::error::Result<Self> {
-        let profiles: HashMap<PathBuf, Option<Profile>> = HashMap::new();
+    #[tracing::instrument(skip(db))]
+    pub async fn init(db: &sled::Db) -> crate::error::Result<Self> {
+        let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
+            Ok(Default::default()),
+            |bytes| {
+                bincode::decode_from_slice::<Box<[PathBuf]>, _>(
+                    &bytes,
+                    *BINCODE_CONFIG,
+                )
+                .map(|it| it.0)
+            },
+        )?;
+
+        let profiles = stream::iter(profile_db.iter())
+            .then(|it| async move {
+                let path = PathBuf::from(it);
+                let prof = match Self::read_profile_from_dir(&path).await {
+                    Ok(prof) => Some(prof),
+                    Err(err) => {
+                        log::warn!("Error loading profile: {err}. Skipping...");
+                        None
+                    }
+                };
+                (path, prof)
+            })
+            .collect::<HashMap<PathBuf, Option<Profile>>>()
+            .await;
 
         Ok(Self(profiles))
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub fn insert(&mut self, profile: Profile) -> crate::error::Result<&Self> {
+        self.0.insert(
+            profile
+                .path
+                .canonicalize()?
+                .to_str()
+                .ok_or(
+                    crate::error::CoreErrors::UTFError(profile.path.clone()).as_error(),
+                )?
+                .into(),
+            Some(profile),
+        );
+        Ok(self)
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn insert_from<'a>(
+        &'a mut self,
+        path: &'a Path,
+    ) -> crate::error::Result<&Self> {
+        self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub fn remove(&mut self, path: &Path) -> crate::error::Result<&Self> {
+        let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
+        self.0.remove(&path);
+        Ok(self)
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub async fn sync<'a>(
+        &'a self,
+        batch: &'a mut sled::Batch,
+    ) -> crate::error::Result<&Self> {
+        stream::iter(self.0.iter())
+            .map(Ok::<_, crate::error::Error>)
+            .try_for_each_concurrent(None, |(path, profile)| async move {
+                let json = serde_json::to_vec_pretty(&profile)?;
+
+                let json_path =
+                    Path::new(path.to_str().unwrap()).join(PROFILE_JSON_PATH);
+
+                fs::write(json_path, json).await?;
+                Ok::<_, crate::error::Error>(())
+            })
+            .await?;
+
+        batch.insert(
+            PROFILE_SUBTREE,
+            bincode::encode_to_vec(
+                self.0.keys().collect::<Box<[_]>>(),
+                *BINCODE_CONFIG,
+            )?,
+        );
+        Ok(self)
+    }
+
+    async fn read_profile_from_dir(path: &Path) -> crate::error::Result<Profile> {
+        let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
+        let mut profile = serde_json::from_slice::<Profile>(&json)?;
+        profile.path = PathBuf::from(path);
+        Ok(profile)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::{assert_eq, assert_str_eq};
+    use std::collections::HashSet;
+
+    #[test]
+    fn profile_test() -> Result<(), serde_json::Error> {
+        let profile = Profile {
+            path: PathBuf::new(),
+            metadata: ProfileMetadata {
+                name: String::from("Example Pack"),
+                icon: None,
+                game_version: String::from("1.18.2"),
+                loader: ModLoader::Vanilla,
+                loader_version: None,
+                format_version: CURRENT_FORMAT_VERSION,
+            },
+            java: Some(JavaSettings {
+                install: Some(PathBuf::from("/usr/bin/java")),
+                extra_arguments: Some(Vec::new()),
+            }),
+            memory: Some(MemorySettings {
+                minimum: None,
+                maximum: 8192,
+            }),
+            resolution: Some(WindowSize(1920, 1080)),
+            hooks: Some(Hooks {
+                pre_launch: HashSet::new(),
+                wrapper: None,
+                post_exit: HashSet::new(),
+            }),
+        };
+        let json = serde_json::json!({
+            "metadata": {
+                "name": "Example Pack",
+                "game_version": "1.18.2",
+                "format_version": 1u32,
+                "loader": "vanilla",
+            },
+            "java": {
+                "extra_arguments": [],
+                "install": "/usr/bin/java",
+            },
+            "memory": {
+              "maximum": 8192u32,
+            },
+            "resolution": (1920u16, 1080u16),
+            "hooks": {},
+        });
+
+        assert_eq!(serde_json::to_value(profile.clone())?, json.clone());
+        assert_str_eq!(
+            format!("{:?}", serde_json::from_value::<Profile>(json)?),
+            format!("{:?}", profile),
+        );
+        Ok(())
     }
 }

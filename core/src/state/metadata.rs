@@ -1,3 +1,4 @@
+use crate::config::BINCODE_CONFIG;
 use bincode::{Decode, Encode};
 use daedalus::{
     minecraft::{fetch_version_manifest, VersionManifest as MinecraftManifest},
@@ -8,7 +9,7 @@ use daedalus::{
 use futures::prelude::*;
 use std::collections::LinkedList;
 
-const METADATA_URL: &str = "https://meta.polyfrost.cc/gamedata";
+const METADATA_URL: &str = "https://polyfrost.nyc3.cdn.digitaloceanspaces.com/gamedata";
 const METADATA_DB_FIELD: &[u8] = b"metadata";
 
 // TODO: store as subtree in database
@@ -48,8 +49,20 @@ impl Metadata {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn init() -> crate::error::Result<Self> {
+    pub async fn init(db: &sled::Db) -> crate::error::Result<Self> {
         let mut metadata = None;
+
+        if let Some(ref meta_bin) = db.get(METADATA_DB_FIELD)? {
+            match bincode::decode_from_slice::<Self, _>(
+                &meta_bin,
+                *BINCODE_CONFIG,
+            ) {
+                Ok((meta, _)) => metadata = Some(meta),
+                Err(err) => {
+                    log::warn!("Could not read launcher metadata: {err}")
+                }
+            }
+        }
 
         let mut fetch_futures = LinkedList::new();
         for _ in 0..3 {
@@ -62,6 +75,14 @@ impl Metadata {
         }
 
         if let Some(meta) = metadata {
+            db.insert(
+                METADATA_DB_FIELD,
+                sled::IVec::from(bincode::encode_to_vec(
+                    &meta,
+                    *BINCODE_CONFIG,
+                )?),
+            )?;
+            db.flush_async().await?;
             Ok(meta)
         } else {
             Err(

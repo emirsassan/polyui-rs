@@ -37,7 +37,7 @@ pub fn select(prompt: &str, choices: &[&str]) -> Result<usize> {
 }
 
 pub async fn select_async(
-    promt: String,
+    prompt: String,
     choices: &'static [&'static str],
 ) -> Result<usize> {
     tokio::task::spawn_blocking(move || select(&prompt, choices)).await?

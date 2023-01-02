@@ -8,11 +8,20 @@ pub enum CoreErrors {
     #[error("Serialization error (JSON): {0}")]
     JSONError(#[from] serde_json::Error),
 
+    #[error("Serialization error (Bincode): {0}")]
+    EncodeError(#[from] bincode::error::EncodeError),
+
+    #[error("Deserialization error (Bincode): {0}")]
+    DecodeError(#[from] bincode::error::DecodeError),
+
     #[error("Error parsing UUID: {0}")]
     UUIDError(#[from] uuid::Error),
 
     #[error("Error parsing URL: {0}")]
     URLError(#[from] url::ParseError),
+
+    #[error("Database error: {0}")]
+    DBError(#[from] sled::Error),
 
     #[error("Database query error: {0}")]
     DBQuery(#[from] prisma_client_rust::QueryError),

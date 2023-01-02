@@ -15,8 +15,9 @@ serde_json = "1.0"
 lazy_static = "1.4.0"
 thiserror = "1.0"
 reqwest = "0.11.13"
-zip = "0.6.3"
+zip = "0.5"
 semver = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 bytes = "1.3.0"
-rust-s3 = "0.32.3"
+rust-s3 = { git = "https://github.com/pauliesnug/rust-s3", rev = "738c4babb750368cae757aa6f675765bc1f7adaf" }
+once_cell = "1.17"

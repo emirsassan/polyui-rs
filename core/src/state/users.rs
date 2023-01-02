@@ -1,12 +1,78 @@
+//! User login info
+use crate::{entities::launcher::msapi::Credentials, config::BINCODE_CONFIG, alias_trait};
+
 const USER_DB_TREE: &[u8] = b"users";
+
 /// The set of users stored in the launcher
 #[derive(Clone)]
-pub(crate) struct Users {
-
-}
+pub(crate) struct Users(pub(crate) sled::Tree);
 
 impl Users {
-    pub fn init(db: crate::prisma::PrismaClient) -> crate::error::Result<Self> {
-        Ok(Users { /* fields */ })
+    #[tracing::instrument(skip(db))]
+    pub fn init(db: &sled::Db) -> crate::error::Result<Self> {
+        Ok(Self(db.open_tree(USER_DB_TREE)?))
+    }
+
+    #[tracing::instrument(skip_all)]
+    pub fn insert(
+        &mut self,
+        credentials: &Credentials,
+    ) -> crate::error::Result<&Self> {
+        let id = credentials.id.as_bytes();
+        self.0.insert(
+            id,
+            bincode::encode_to_vec(credentials, *BINCODE_CONFIG)?,
+        )?;
+        Ok(self)
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub fn contains(&self, id: uuid::Uuid) -> crate::error::Result<bool> {
+        Ok(self.0.contains_key(id.as_bytes())?)
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub fn get(&self, id: uuid::Uuid) -> crate::error::Result<Option<Credentials>> {
+        self.0.get(id.as_bytes())?.map_or(Ok(None), |prof| {
+            bincode::decode_from_slice(&prof, *BINCODE_CONFIG)
+                .map_err(crate::error::Error::from)
+                .map(|it| Some(it.0))
+        })
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub fn remove(&mut self, id: uuid::Uuid) -> crate::error::Result<&Self> {
+        self.0.remove(id.as_bytes())?;
+        Ok(self)
+    }
+
+    pub fn iter(&self) -> UserIter<impl UserInnerIter> {
+        UserIter(self.0.iter().values(), false)
+    }
+}
+
+alias_trait! {
+    pub UserInnerIter: Iterator<Item = sled::Result<sled::IVec>>, Send, Sync
+}
+
+#[derive(Debug)]
+pub struct UserIter<I: UserInnerIter>(I, bool);
+
+impl<I: UserInnerIter> Iterator for UserIter<I> {
+    type Item = crate::error::Result<Credentials>;
+
+    #[tracing::instrument(skip(self))]
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 {
+            return None;
+        }
+
+        let it = self.0.next()?;
+        let res = it.map_err(crate::error::Error::from).and_then(|it| {
+            Ok(bincode::decode_from_slice(&it, *BINCODE_CONFIG)?.0)
+        });
+
+        self.1 = res.is_err();
+        Some(res)
     }
 }

@@ -12,6 +12,7 @@ mod utils;
 mod subcommands;
 
 #[derive(argh::FromArgs, Debug)]
+/// The official OneLauncher CLI
 pub struct Args {
     #[argh(subcommand)]
     pub subcommand: subcommands::Subcommand,
