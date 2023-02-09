@@ -56,10 +56,7 @@ export function Footer() {
 					<FooterLink blank link="https://docs.polyfrost.cc">
 						Documentation
 					</FooterLink>
-					<FooterLink
-						blank
-						link="https://github.com/polyfrost/oneconfig/blob/main/CONTRIBUTING.md"
-					>
+					<FooterLink blank link="https://github.com/polyfrost/oneconfig/blob/main/CONTRIBUTING.md">
 						Contribute
 					</FooterLink>
 					<div className="opacity-50 pointer-events-none">

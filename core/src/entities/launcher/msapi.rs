@@ -9,7 +9,7 @@ use url::Url;
 use crate::wrap_ref_builder;
 
 pub const MSAPI_URL: Lazy<Url> =
-    Lazy::new(|| Url::parse("https://msapi.polyfrost.cc").unwrap());
+    Lazy::new(|| Url::parse("https://127.0.0.1:8080").unwrap());
 
 #[derive(Deserialize)]
 struct ErrorJSON {

@@ -40,18 +40,20 @@ impl Config {
 
         let public_url = config_option!(
             env "POLYUI_PUBLIC_URL" => |it| Url::parse(&it).ok(),
-            default Url::parse("https://{host}:{port}/").unwrap()
+            default Url::parse("https://127.0.0.1:8080/").unwrap()
         );
 
         let client_id = config_option!(
-            env "POLYUI_CLIENT_ID"
-        )
-        .ok_or_else(|| eyre::eyre!("Could not find PolyUI client ID"))?;
+            env "POLYUI_CLIENT_ID",
+            default String::from("9eac3a4e-8cdd-43ef-863e-49cd601b1f03")
+        );
+        // .ok_or_else(|| eyre::eyre!("Could not find PolyUI client ID"))?;
 
         let client_secret = config_option!(
-            env "POLYUI_CLIENT_SECRET"
-        )
-        .ok_or_else(|| eyre::eyre!("Could not find PolyUI client secret"))?;
+            env "POLYUI_CLIENT_SECRET",
+            default String::from("AGl8Q~RWp0A~WSNB.dN-9n.kNNQk7So0KlN7lbtb")
+        );
+        // .ok_or_else(|| eyre::eyre!("Could not find PolyUI client secret"))?;
 
         let rate_limit = config_option!(
             env "POLYUI_RATE_LIMIT" => |it| it.parse::<u8>().ok(),

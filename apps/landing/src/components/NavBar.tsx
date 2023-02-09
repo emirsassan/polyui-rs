@@ -60,7 +60,7 @@ export default function NavBar() {
 		>
 			<div className="relative flex max-w-[100rem] mx-auto items-center h-full m-auto p-5">
 				<a href="/" className="absolute flex flex-row items-center">
-					{ /* <img src={AppLogo} className="z-30 w-8 h-8 mr-3" /> */ }
+					{/* <img src={AppLogo} className="z-30 w-8 h-8 mr-3" /> */}
 					<h3 className="text-xl font-bold text-white">Polyfrost</h3>
 				</a>
 

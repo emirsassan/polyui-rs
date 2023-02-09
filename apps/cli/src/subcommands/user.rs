@@ -50,6 +50,8 @@ impl UserAdd {
             None => webbrowser::open(url.as_str()),
         }?;
 
+        info!("{}", url.as_str());
+
         let credentials = flow.await??;
         State::sync().await?;
         success!("Logged in user {}.", credentials.username);
