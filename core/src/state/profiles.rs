@@ -1,5 +1,5 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::config::BINCODE_CONFIG;
+use crate::{config::BINCODE_CONFIG, entities::model::mod_type::JARLoadedMod};
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -47,6 +47,7 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
+    pub cached_mods: HashMap<String, JARLoadedMod>,
 }
 
 // TODO: Quilt
@@ -105,6 +106,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                cached_mods: HashMap::new()
             },
             java: None,
             memory: None,
@@ -195,6 +197,12 @@ impl Profile {
         self.hooks = hooks;
         self
     }
+
+    #[tracing::instrument]
+    pub fn with_installed_mods(&mut self, mod_data: HashMap<String, JARLoadedMod>) -> &mut Self {
+        self.metadata.cached_mods = mod_data;
+        self
+    }
 }
 
 impl Profiles {
@@ -270,8 +278,9 @@ impl Profiles {
             .try_for_each_concurrent(None, |(path, profile)| async move {
                 let json = serde_json::to_vec_pretty(&profile)?;
 
-                let json_path =
-                    Path::new(path.to_str().unwrap()).join(PROFILE_JSON_PATH);
+                let json_path = Path::new(path.to_str()
+                    .expect("Could not convert path to string."))
+                    .join(PROFILE_JSON_PATH);
 
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::error::Error>(())
@@ -313,6 +322,7 @@ mod tests {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                cached_mods: HashMap::from([]),
             },
             java: Some(JavaSettings {
                 install: Some(PathBuf::from("/usr/bin/java")),
@@ -335,6 +345,10 @@ mod tests {
                 "game_version": "1.18.2",
                 "format_version": 1u32,
                 "loader": "vanilla",
+                "installed_mods": {
+                    "Extra Tooltips": "2067e9cfa9f6ef66ea6ad6b9e924187d928fc391",
+                    "Fabric": "a010de5c6165e503fcfe680bacc4afd24637cb71"
+                },
             },
             "java": {
                 "extra_arguments": [],
@@ -344,7 +358,7 @@ mod tests {
               "maximum": 8192u32,
             },
             "resolution": (1920u16, 1080u16),
-            "hooks": {},
+            "hooks": {}
         });
 
         assert_eq!(serde_json::to_value(profile.clone())?, json.clone());

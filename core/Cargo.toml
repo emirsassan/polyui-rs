@@ -54,9 +54,10 @@ bytes = "1"
 sys-info = "0.9"
 regex = "1"
 sled = { version = "0.34.7", features = ["compression"] }
+tempfile = "3.3.0"
+toml = "0.7.2"
 
 [dev-dependencies]
-tempfile = "^3.3.0"
 tracing-test = "^0.2.3"
 argh = "0.1"
 pretty_assertions = "1.1.0"

@@ -38,6 +38,8 @@ mod libraries;
 mod microsoft;
 mod minecraft;
 mod normi;
+mod mod_sync;
+mod mod_extraction;
 pub mod utils;
 
 pub mod data {
